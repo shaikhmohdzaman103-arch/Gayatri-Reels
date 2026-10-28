@@ -8,7 +8,8 @@ Usage:
 Rules (from the brief):
   shot = audio duration + holdAfter, minimum 4.0s, never under 3s
   the reframe line holds 2.0s of silence on the same photo
-  total 32-40s including the 3s end card
+  total 32-40.5s including the 3s end card
+  line 1's voice starts LEAD_IN after the cut, so the first frames are text-free (thumbnail)
 """
 import json
 import subprocess
@@ -18,6 +19,8 @@ MIN_SHOT = 4.0
 END_CARD = 3.0
 REFRAME_LINE = 6
 REFRAME_EXTRA_HOLD = 2.0
+LEAD_IN = 0.5
+MAX_TOTAL = 40.5
 
 # line, speaker, photo, planned audio seconds (script sec minus pause), pause after.
 PLAN = [
@@ -60,12 +63,14 @@ def build(estimate):
         audio = f"audio/{line:02d}.mp3"
         dur = planned if estimate else probe(audio)
         hold = pause + (REFRAME_EXTRA_HOLD if line == REFRAME_LINE else 0.0)
-        shot = max(dur + hold, MIN_SHOT)
-        hold = round(shot - dur, 2)  # padding to the minimum goes into the hold
+        offset = LEAD_IN if i == 0 else 0.0
+        shot = max(offset + dur + hold, MIN_SHOT)
+        hold = round(shot - offset - dur, 2)  # padding to the minimum goes into the hold
         rows.append({
             "line": line, "speaker": speaker, "audio": audio, "audioDuration": round(dur, 2),
             "photo": photo, "cameraIn": cam_in, "cameraOut": cam_out,
-            "start": round(t, 2), "end": round(t + shot, 2), "holdAfter": hold,
+            "start": round(t, 2), "end": round(t + shot, 2), "audioStart": round(t + offset, 2),
+            "holdAfter": hold,
         })
         t += shot
     return rows, t
@@ -76,8 +81,8 @@ def main():
     rows, total = build(estimate)
     with_card = total + END_CARD
     if not estimate:
-        if not 32.0 <= with_card <= 40.0:
-            sys.exit(f"Total {with_card:.2f}s (with end card) is outside 32-40s; not writing timeline.json")
+        if not 32.0 <= with_card <= MAX_TOTAL:
+            sys.exit(f"Total {with_card:.2f}s (with end card) is outside 32-40.5s; not writing timeline.json")
         with open("timeline.json", "w") as f:
             json.dump(rows, f, indent=2)
     print("| Line | Audio | Dur | Photo | Camera in → out | Start | End | Hold |")

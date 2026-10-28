@@ -118,7 +118,7 @@ Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
     for r in timeline:
         text = LINES[r["line"]]
         cs = cues(text)
-        start = r["start"]
+        start = r["audioStart"]
         speak_end = start + r["audioDuration"]
         # last cue stays to the end of the shot on the reframe (screenshot line), else 0.4s past the voice
         last_end = r["end"] if r["line"] == REFRAME_LINE else min(speak_end + 0.4, r["end"])
@@ -161,7 +161,7 @@ def duck_expr(timeline):
     g = 1 - 10 ** (-DUCK_DB / 20)
     terms = []
     for r in timeline:
-        s, e = r["start"], r["start"] + r["audioDuration"]
+        s, e = r["audioStart"], r["audioStart"] + r["audioDuration"]
         terms.append(f"clip((t-({s - DUCK_RAMP:.2f}))/{DUCK_RAMP},0,1)*clip(({e + DUCK_RAMP:.2f}-t)/{DUCK_RAMP},0,1)")
     return f"1-{g:.3f}*min(1,{'+'.join(terms)})"
 
@@ -181,12 +181,14 @@ def graph(timeline, ass_path, loudnorm):
              f"trim=duration={END_CARD},setpts=PTS-STARTPTS,format=yuv420p[card]")
     f.append("[main][card]concat=n=2:v=1:a=0[vout]")
     for j, r in enumerate(timeline):
-        ms = round(r["start"] * 1000)
+        ms = round(r["audioStart"] * 1000)
         f.append(f"[{k + 1 + j}:a]aformat=sample_rates=48000:channel_layouts=stereo,adelay={ms}:all=1[a{j}]")
     f.append("".join(f"[a{j}]" for j in range(k)) + f"amix=inputs={k}:normalize=0:duration=longest[voice]")
     f.append(f"anoisesrc=color=brown:amplitude=0.5:sample_rate=48000:duration={total:.2f},"
              "lowpass=f=320,highpass=f=40,aformat=channel_layouts=stereo,"
-             f"volume={ROOM_DB}dB,afade=t=in:d=1,afade=t=out:st={total - 0.5:.2f}:d=0.5,"
+             f"volume={ROOM_DB}dB,afade=t=in:d=1,"
+             # fade the last 0.5s down 12 dB, never to zero, so the file never ends in digital silence
+             f"volume='if(gt(t,{total - 0.5:.2f}),1-{1 - 10 ** (-12 / 20):.3f}*(t-{total - 0.5:.2f})/0.5,1)':eval=frame,"
              f"volume='{duck_expr(timeline)}':eval=frame[room]")
     f.append(f"[voice][room]amix=inputs=2:normalize=0:duration=longest,atrim=end={total:.2f},{loudnorm}[aout]")
     return ";\n".join(f), total
