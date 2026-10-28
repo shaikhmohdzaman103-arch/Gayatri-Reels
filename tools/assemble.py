@@ -6,7 +6,7 @@ Usage:
   python3 tools/assemble.py --print --estimate  # same, from planned durations (no timeline.json needed)
   python3 tools/assemble.py --run               # loudness pass 1, then the render
 
-Inputs: timeline.json, audio/NN.mp3, photos/NN.jpg (9:16 or wider), endcard.png.
+Inputs: timeline.json, audio/NN.mp3, photos/NN.jpg (9:16 or wider), ENDCARD below.
 """
 import json
 import os
@@ -21,6 +21,7 @@ SRC_H = 2200 * 2          # 2200px tall, oversampled 2x so slow moves stay sub-p
 SRC_W = SRC_H * 9 // 16   # 9:16 crop of the oversampled photo
 Z0 = SRC_H / (H * 2)      # zoom that frames 1920 of the 2200px
 END_CARD = 3.0
+ENDCARD = "endcards/03-fix.png"  # reel 07 sells the 30-Day Fix (ladder slot 03)
 ROOM_DB = -38
 DUCK_DB = 4
 DUCK_RAMP = 0.15
@@ -199,7 +200,7 @@ def inputs(timeline):
     for r in timeline:
         d = r["end"] - r["start"]
         cmd += ["-loop", "1", "-framerate", str(FPS), "-t", f"{d:.2f}", "-i", f"photos/{r['photo']:02d}.jpg"]
-    cmd += ["-loop", "1", "-framerate", str(FPS), "-t", str(END_CARD), "-i", "endcard.png"]
+    cmd += ["-loop", "1", "-framerate", str(FPS), "-t", str(END_CARD), "-i", ENDCARD]
     for r in timeline:
         cmd += ["-i", r["audio"]]
     return cmd
