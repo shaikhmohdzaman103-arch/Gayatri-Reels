@@ -19,17 +19,29 @@ END_CARD = 3.0
 REFRAME_LINE = 6
 REFRAME_EXTRA_HOLD = 2.0
 
-# line, speaker, photo, planned audio seconds (script sec minus pause), pause after, camera in/out
-# Camera states: scale, then the frame centre as a fraction of width and height.
+# line, speaker, photo, planned audio seconds (script sec minus pause), pause after.
 PLAN = [
-    (1, "Rajesh", 1, 4.2, 0.8, {"scale": 1.00, "x": 0.50, "y": 0.50}, {"scale": 1.10, "x": 0.62, "y": 0.58}),  # push-in to cold chai
-    (2, "Rajesh", 2, 5.3, 0.7, {"scale": 1.15, "x": 0.30, "y": 0.50}, {"scale": 1.15, "x": 0.70, "y": 0.50}),  # pan L->R, stop on "140"
-    (3, "Rajesh", 3, 3.0, 1.0, {"scale": 1.20, "x": 0.50, "y": 0.50}, {"scale": 1.00, "x": 0.50, "y": 0.50}),  # hold 2s, then pull-out
-    (4, "Rajesh", 4, 6.2, 0.8, {"scale": 1.00, "x": 0.50, "y": 0.50}, {"scale": 1.12, "x": 0.50, "y": 0.45}),  # push-in to calculator
-    (5, "Rajesh", 5, 3.0, 1.0, {"scale": 1.15, "x": 0.50, "y": 0.70}, {"scale": 1.15, "x": 0.50, "y": 0.30}),  # tilt up racks
-    (6, "Meera",  6, 5.0, 0.0, {"scale": 1.00, "x": 0.50, "y": 0.50}, {"scale": 1.02, "x": 0.50, "y": 0.50}),  # 2% drift, held through silence
-    (7, "Rajesh", 8, 3.5, 0.5, {"scale": 1.12, "x": 0.50, "y": 0.50}, {"scale": 1.00, "x": 0.50, "y": 0.50}),  # pull-out wide on desk
+    (1, "Rajesh", 1, 4.2, 0.8),
+    (2, "Rajesh", 2, 5.3, 0.7),
+    (3, "Rajesh", 3, 3.0, 1.0),
+    (4, "Rajesh", 4, 6.2, 0.8),
+    (5, "Rajesh", 5, 3.0, 1.0),
+    (6, "Meera",  6, 5.0, 0.0),  # reframe: photo holds through the 2s silence
+    (7, "Rajesh", 8, 3.5, 0.5),
 ]
+
+# Camera: alternate a 4% push-in with a 3% horizontal drift, flipping drift
+# direction each time. One axis per shot, never more than 5%.
+PUSH = 0.04
+DRIFT = 0.03
+
+
+def camera(i):
+    if i % 2 == 0:
+        return {"move": "push", "scale": 1.00, "x": 0.0}, {"move": "push", "scale": 1.0 + PUSH, "x": 0.0}
+    direction = 1 if (i // 2) % 2 == 0 else -1
+    return ({"move": "drift", "scale": 1.00, "x": -direction * DRIFT / 2},
+            {"move": "drift", "scale": 1.00, "x": direction * DRIFT / 2})
 
 
 def probe(path):
@@ -43,7 +55,8 @@ def probe(path):
 def build(estimate):
     t = 0.0
     rows = []
-    for line, speaker, photo, planned, pause, cam_in, cam_out in PLAN:
+    for i, (line, speaker, photo, planned, pause) in enumerate(PLAN):
+        cam_in, cam_out = camera(i)
         audio = f"audio/{line:02d}.mp3"
         dur = planned if estimate else probe(audio)
         hold = pause + (REFRAME_EXTRA_HOLD if line == REFRAME_LINE else 0.0)
@@ -71,7 +84,10 @@ def main():
     print("|---|---|---|---|---|---|---|---|")
     for r in rows:
         ci, co = r["cameraIn"], r["cameraOut"]
-        cam = f'{ci["scale"]:.2f}@({ci["x"]},{ci["y"]}) → {co["scale"]:.2f}@({co["x"]},{co["y"]})'
+        if ci["move"] == "push":
+            cam = f'push {ci["scale"]:.2f} → {co["scale"]:.2f}'
+        else:
+            cam = f'drift x {ci["x"]:+.3f} → {co["x"]:+.3f}'
         print(f'| {r["line"]} | {r["audio"]} | {r["audioDuration"]:.2f} | {r["photo"]} | {cam} | '
               f'{r["start"]:.2f} | {r["end"]:.2f} | {r["holdAfter"]:.2f} |')
     print(f"\nShots {total:.2f}s + end card {END_CARD:.0f}s = {with_card:.2f}s"
