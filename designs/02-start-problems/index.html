@@ -1,0 +1,333 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<link rel="stylesheet" href="../../assets/fonts/local.css">
+<style>
+  :root {
+    --bg: #0F2B23; --bg-hi: #15392F; --bg-lo: #0A2119;
+    --gold: #D1A955; --gold-dim: #987D44; --cream: #F2EDE1; --muted: #A9B8B0;
+    --ink: #10271F; --tile: #1D453C; --salmon: #E8735A; --red: #B5402B;
+    --cond: 'Archivo', 'Inter', sans-serif;
+    --serif: 'Instrument Serif', serif;
+    --mono: 'IBM Plex Mono', 'JetBrains Mono', monospace;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body { width: 1080px; height: 1920px; overflow: hidden; background: var(--bg); }
+  body { position: relative; font-family: var(--cond); color: var(--cream); -webkit-font-smoothing: antialiased; }
+
+  #bg { position: absolute; inset: 0;
+    background: radial-gradient(120% 70% at 50% 38%, var(--bg-hi) 0%, var(--bg) 45%, var(--bg-lo) 100%); }
+  #grid { position: absolute; inset: 0; opacity: .5;
+    background-image: linear-gradient(rgba(255,255,255,.022) 1.5px, transparent 1.5px),
+                      linear-gradient(90deg, rgba(255,255,255,.022) 1.5px, transparent 1.5px);
+    background-size: 90px 90px; background-position: 0 0; }
+  #watermark { position: absolute; left: 300px; top: 1370px; width: 480px; opacity: .11; }
+
+  .abs { position: absolute; }
+  .label { font-family: var(--mono); font-weight: 600; font-size: 25px; letter-spacing: .2em; color: var(--gold); text-transform: uppercase; }
+  .h { font-family: var(--cond); font-stretch: 72%; font-weight: 800; line-height: .96; letter-spacing: -.012em; color: var(--cream); }
+  .it { font-family: var(--serif); font-style: italic; font-weight: 400; color: var(--gold); letter-spacing: -.01em; line-height: 1; }
+  .body { font-family: var(--cond); font-stretch: 100%; font-weight: 400; font-size: 38px; line-height: 1.3; color: var(--muted); }
+  .mono { font-family: var(--mono); }
+
+  /* header */
+  #header { left: 72px; top: 128px; display: flex; align-items: center; gap: 18px; }
+  #header svg { width: 52px; height: 46px; }
+  .wordmark { font-family: var(--cond); font-stretch: 125%; font-weight: 700; font-size: 31px; letter-spacing: .16em; color: var(--cream); }
+  #counter { right: 72px; top: 136px; font-family: var(--mono); font-size: 28px; letter-spacing: .12em; color: var(--muted); }
+
+  /* fix block, shared by the three problem scenes */
+  .fix { left: 72px; top: 1196px; width: 936px; }
+  .fix .rule { height: 2px; background: var(--gold-dim); transform-origin: left center; }
+  .fix .label { margin-top: 26px; font-size: 24px; }
+  .fix .name { margin-top: 10px; font-size: 70px; }
+
+  /* scene 1: broken telephone */
+  .row { left: 72px; width: 936px; height: 112px; }
+  .row .who { position: absolute; left: 0; top: 20px; width: 252px; }
+  .row .who b { display: block; font-family: var(--mono); font-weight: 700; font-size: 22px; letter-spacing: .1em; color: var(--gold); white-space: nowrap; }
+  .row .who span { display: block; margin-top: 6px; font-family: var(--mono); font-size: 21px; color: var(--muted); }
+  .bubble { position: absolute; left: 262px; top: 0; width: 674px; height: 112px; border-radius: 22px;
+    display: flex; align-items: center; padding: 0 32px; color: var(--ink);
+    font-family: var(--cond); font-stretch: 92%; font-weight: 650; font-size: 38px; letter-spacing: -.005em; }
+  .bubble::before { content: ''; position: absolute; left: -12px; top: 44px; border: 12px solid transparent; border-left: 0; border-right-color: inherit; }
+  .b1 { background: var(--cream); border-color: var(--cream); }
+  .b2 { background: #DCD4C1; border-color: #DCD4C1; transform: rotate(-1.3deg);
+    background-image: repeating-linear-gradient(0deg, rgba(0,0,0,.035) 0 2px, transparent 2px 6px); }
+  .b3 { background: #CEC5AF; border-color: #CEC5AF; transform: rotate(1.3deg);
+    background-image: repeating-linear-gradient(0deg, rgba(0,0,0,.05) 0 2px, transparent 2px 5px), repeating-linear-gradient(90deg, rgba(0,0,0,.03) 0 1px, transparent 1px 4px); }
+  .red { color: var(--red); position: relative; }
+  .red i { position: absolute; left: 0; right: 0; bottom: -6px; height: 4px; background: var(--red); transform-origin: left center; border-radius: 2px; }
+
+  /* scene 2: leak pipeline */
+  .pipe-lbl { top: 742px; font-family: var(--mono); font-size: 24px; letter-spacing: .18em; color: var(--muted); }
+  .tile { top: 800px; width: 222px; height: 104px; border-radius: 12px; background: var(--tile);
+    display: flex; align-items: center; justify-content: center;
+    font-family: var(--mono); font-weight: 700; font-size: 24px; letter-spacing: .07em; color: var(--cream); border: 3px solid transparent; }
+  .chip { display: inline-flex; align-items: center; height: 66px; padding: 0 26px; border-radius: 40px; border: 2.5px solid var(--gold);
+    font-family: var(--cond); font-stretch: 92%; font-weight: 650; font-size: 31px; color: var(--cream); white-space: nowrap; }
+  .drop { width: 18px; height: 24px; background: var(--gold); border-radius: 50% 50% 50% 50% / 62% 62% 38% 38%; }
+
+  /* scene 3: org chart */
+  .box { border-radius: 16px; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+  .you { left: 390px; top: 690px; width: 300px; height: 128px; background: var(--gold); color: var(--ink); }
+  .you b { font-family: var(--cond); font-stretch: 100%; font-weight: 900; font-size: 64px; line-height: 1; }
+  .you span { margin-top: 8px; font-family: var(--mono); font-weight: 600; font-size: 19px; letter-spacing: .2em; }
+  .vacant { left: 738px; top: 692px; width: 270px; height: 124px; border: 3px dashed var(--gold); background: rgba(0,0,0,.18); }
+  .vacant em { font-family: var(--serif); font-style: italic; color: var(--gold); font-size: 46px; line-height: 1; margin-top: -4px; }
+  .vacant b { margin-top: 2px; font-family: var(--mono); font-weight: 700; font-size: 17px; letter-spacing: .05em; color: var(--cream); white-space: nowrap; }
+  .vacant span { margin-top: 6px; font-family: var(--mono); font-weight: 700; font-size: 18px; letter-spacing: .18em; color: var(--salmon); white-space: nowrap; }
+  .rep { top: 930px; width: 214px; height: 100px; background: rgba(255,255,255,.035); border: 2px solid rgba(255,255,255,.12); }
+  .rep b { font-family: var(--cond); font-stretch: 92%; font-weight: 700; font-size: 33px; color: var(--cream); }
+  .rep span { margin-top: 6px; font-family: var(--mono); font-size: 15px; letter-spacing: .2em; color: var(--muted); }
+  .line { background: rgba(255,255,255,.28); }
+
+  /* scene 4: CTA */
+  .center { left: 0; width: 1080px; text-align: center; }
+  .ticket { left: 90px; top: 772px; width: 900px; height: 236px; border-radius: 24px; background: var(--gold); color: var(--ink);
+    box-shadow: 0 24px 60px rgba(0,0,0,.35); }
+  .ticket .l { position: absolute; left: 46px; top: 38px; }
+  .ticket .l .k { font-family: var(--mono); font-weight: 600; font-size: 25px; letter-spacing: .22em; }
+  .ticket .l .t { margin-top: 4px; font-family: var(--cond); font-stretch: 72%; font-weight: 800; font-size: 84px; line-height: 1; letter-spacing: -.012em; }
+  .ticket .l .m { margin-top: 16px; font-family: var(--mono); font-size: 22px; letter-spacing: .08em; }
+  .ticket .sep { position: absolute; left: 618px; top: 22px; bottom: 22px; border-left: 3px dashed rgba(16,39,31,.45); }
+  .ticket .notch { position: absolute; left: 604px; width: 32px; height: 32px; border-radius: 50%; background: var(--bg); }
+  .ticket .r { position: absolute; left: 636px; right: 18px; top: 34px; text-align: center; }
+  .ticket .r .p { font-family: var(--cond); font-stretch: 72%; font-weight: 900; font-size: 116px; line-height: 1; letter-spacing: -.02em; }
+  .ticket .r .g { margin-top: 12px; font-family: var(--mono); font-weight: 700; font-size: 20px; letter-spacing: .2em; }
+  .chip2 { display: inline-flex; align-items: center; height: 54px; padding: 0 22px; border-radius: 30px; border: 2px solid var(--gold);
+    font-family: var(--mono); font-weight: 600; font-size: 22px; letter-spacing: .12em; color: var(--gold); text-transform: uppercase; }
+  .comment { display: inline-flex; align-items: center; gap: 14px; height: 84px; padding: 0 40px; border-radius: 44px; background: var(--cream); color: var(--ink);
+    font-family: var(--mono); font-weight: 700; font-size: 32px; letter-spacing: .14em; }
+  .comment b { font-family: var(--cond); font-stretch: 100%; font-weight: 900; font-size: 40px; letter-spacing: .04em; color: var(--ink); }
+
+  #wipe { position: absolute; top: 0; left: 0; width: 1080px; height: 1920px; background: var(--gold); transform: translateX(-1100px); }
+</style>
+</head>
+<body>
+<div id="bg"></div>
+<div id="grid"></div>
+<svg id="watermark" viewBox="0 0 100 92" fill="none" stroke="#D1A955" stroke-width="1.1" stroke-linejoin="round">
+  <path d="M50 6 C63 26 63 54 50 76 C37 54 37 26 50 6 Z"/>
+  <path d="M50 76 C33 70 17 56 9 34 C29 36 44 52 50 76 Z"/>
+  <path d="M50 76 C67 70 83 56 91 34 C71 36 56 52 50 76 Z"/>
+  <path d="M14 88 H86"/>
+</svg>
+
+<!-- persistent header -->
+<div id="header" class="abs">
+  <svg viewBox="0 0 100 92" fill="none" stroke="#D1A955" stroke-width="6" stroke-linejoin="round" stroke-linecap="round">
+    <path d="M50 6 C63 26 63 54 50 76 C37 54 37 26 50 6 Z"/>
+    <path d="M50 76 C33 70 17 56 9 34 C29 36 44 52 50 76 Z"/>
+    <path d="M50 76 C67 70 83 56 91 34 C71 36 56 52 50 76 Z"/>
+    <path d="M14 88 H86"/>
+  </svg>
+  <div class="wordmark">GAYATRI BUSINESS</div>
+</div>
+<div id="counter" class="abs"></div>
+
+<!-- S0 hook: on screen from frame 0, so the first frame is the thumbnail -->
+<section class="scene" data-start="-1" data-end="3.6">
+  <div class="abs label" style="left:72px; top:330px" data-in="-1">For owners of ₹10–100 Cr businesses</div>
+  <div class="abs" id="hook" style="left:72px; top:392px; width:936px; transform-origin: 0 0">
+    <div class="h" style="font-size:132px">Plan made.<svg class="tick" data-in="0.45" data-anim="pop" style="display:inline-block; width:92px; height:92px; margin-left:22px; vertical-align:-6px" viewBox="0 0 24 24" fill="none" stroke="#D1A955" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12.5 L9.5 18 L20 6"/></svg></div>
+    <div class="h" style="font-size:132px">Team hired.<svg class="tick" data-in="0.75" data-anim="pop" style="display:inline-block; width:92px; height:92px; margin-left:22px; vertical-align:-6px" viewBox="0 0 24 24" fill="none" stroke="#D1A955" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12.5 L9.5 18 L20 6"/></svg></div>
+    <div class="h" style="font-size:132px">Advisers paid.<svg class="tick" data-in="1.05" data-anim="pop" style="display:inline-block; width:92px; height:92px; margin-left:22px; vertical-align:-6px" viewBox="0 0 24 24" fill="none" stroke="#D1A955" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12.5 L9.5 18 L20 6"/></svg></div>
+    <div class="it" style="font-size:170px; margin-top:22px">Still stuck?</div>
+  </div>
+  <div class="abs body" style="left:72px; top:1040px; width:936px; font-size:42px" data-in="1.5">It's usually one of <span style="color:var(--cream); font-weight:600">three problems.</span><br>Here's which fix matches yours.</div>
+</section>
+
+<!-- S1 the execution gap -->
+<section class="scene" data-start="3.6" data-end="11.8" data-counter="01 / 03">
+  <div class="abs label" style="left:72px; top:300px" data-in="3.85">Problem 01 · The execution gap</div>
+  <div class="abs h" style="left:72px; top:352px; width:936px; font-size:100px" data-in="4.0">Your strategy is a game of</div>
+  <div class="abs it" style="left:68px; top:452px; font-size:136px" data-in="4.35">broken telephone.</div>
+
+  <div class="abs row" style="top:690px" data-in="5.0" data-anim="slide">
+    <div class="who"><b>YOU SAID</b><span>in the cabin</span></div>
+    <div class="bubble b1">Cut debtor days from 90 to 60.</div>
+  </div>
+  <div class="abs row" style="top:836px" data-in="5.9" data-anim="slide">
+    <div class="who"><b>MANAGER HEARD</b><span>in the review</span></div>
+    <div class="bubble b2">Push sales hard. Collect later.</div>
+  </div>
+  <div class="abs row" style="top:982px" data-in="6.8" data-anim="slide">
+    <div class="who"><b>SHOP FLOOR DID</b><span>on Monday</span></div>
+    <div class="bubble b3">Gave a dealer&nbsp;<span class="red">120 days' credit.<i data-in="7.45" data-anim="draw" data-dur="0.45"></i></span></div>
+  </div>
+  <div class="abs mono" style="left:72px; top:1128px; font-size:27px; letter-spacing:.14em; color:var(--muted)" data-in="8.1">ONE PLAN. THREE VERSIONS. <b style="color:var(--salmon)">ZERO RESULTS.</b></div>
+
+  <div class="abs fix" style="top:1228px">
+    <div class="rule" data-in="9.0" data-anim="draw" data-dur="0.5"></div>
+    <div class="label" data-in="9.15">The fix →</div>
+    <div class="h name" data-in="9.3">Leadership Team Workshop</div>
+  </div>
+</section>
+
+<!-- S2 hired advisers before -->
+<section class="scene" data-start="11.8" data-end="18.8" data-counter="02 / 03">
+  <div class="abs label" style="left:72px; top:300px" data-in="12.05">Problem 02 · Hired advisers before?</div>
+  <div class="abs h" style="left:72px; top:352px; width:936px; font-size:92px" data-in="12.2">Still stuck after the advice? You fixed the symptom,</div>
+  <div class="abs it" style="left:68px; top:536px; font-size:136px" data-in="12.6">not the leak.</div>
+
+  <div class="abs pipe-lbl" style="left:72px" data-in="13.0">REVENUE IN →</div>
+  <div class="abs pipe-lbl" style="right:72px" data-in="13.0">→ PROFIT OUT</div>
+  <div class="abs tile" style="left:72px" data-in="13.1">PRICING</div>
+  <div class="abs tile" id="t-coll" style="left:310px" data-in="13.2">COLLECTIONS</div>
+  <div class="abs tile" style="left:548px" data-in="13.3">OVERHEADS</div>
+  <div class="abs tile" style="left:786px" data-in="13.4">STOCK</div>
+  <svg class="abs" id="glass" style="left:0; top:0; width:150px; height:150px" viewBox="0 0 150 150" fill="none" stroke="#D1A955" stroke-width="9" stroke-linecap="round">
+    <circle cx="58" cy="58" r="42"/><path d="M89 89 L132 132"/></svg>
+  <div class="abs drop" id="d1" style="left:412px; top:918px"></div>
+  <div class="abs drop" id="d2" style="left:412px; top:918px"></div>
+
+  <div class="abs label" style="left:72px; top:1036px; font-size:23px" data-in="15.0">You leave with</div>
+  <div class="abs" style="left:72px; top:1078px; display:flex; gap:16px">
+    <div class="chip" data-in="15.15" data-anim="pop">An issue map</div>
+    <div class="chip" data-in="15.35" data-anim="pop">Top 3 priorities</div>
+    <div class="chip" data-in="15.55" data-anim="pop">A 30-day action sheet</div>
+  </div>
+
+  <div class="abs fix" style="top:1228px">
+    <div class="rule" data-in="16.1" data-anim="draw" data-dur="0.5"></div>
+    <div class="label" data-in="16.25">The fix →</div>
+    <div class="h name" data-in="16.4">Business Clarity Session</div>
+  </div>
+</section>
+
+<!-- S3 lonely at the top -->
+<section class="scene" data-start="18.8" data-end="25.4" data-counter="03 / 03">
+  <div class="abs label" style="left:72px; top:300px" data-in="19.05">Problem 03 · Lonely at the top</div>
+  <div class="abs h" style="left:72px; top:352px; width:936px; font-size:100px" data-in="19.2">Everyone reports to you.</div>
+  <div class="abs it" style="left:68px; top:458px; font-size:112px; white-space:nowrap" data-in="19.6">Who do you think with?</div>
+
+  <div class="abs box you" data-in="20.3" data-anim="pop"><b>YOU</b><span>OWNER · MD</span></div>
+  <div class="abs line" style="left:539px; top:818px; width:3px; height:58px; transform-origin: top" data-in="20.6" data-anim="drawy" data-dur="0.25"></div>
+  <div class="abs line" style="left:178px; top:874px; width:726px; height:3px" data-in="20.75" data-anim="drawc" data-dur="0.35"></div>
+  <div class="abs line" style="left:178px; top:874px; width:3px; height:56px" data-in="21.0"></div>
+  <div class="abs line" style="left:420px; top:874px; width:3px; height:56px" data-in="21.0"></div>
+  <div class="abs line" style="left:660px; top:874px; width:3px; height:56px" data-in="21.0"></div>
+  <div class="abs line" style="left:902px; top:874px; width:3px; height:56px" data-in="21.0"></div>
+  <div class="abs box rep" style="left:72px" data-in="21.05"><b>Sales head</b><span>REPORTS TO YOU</span></div>
+  <div class="abs box rep" style="left:314px" data-in="21.15"><b>Accounts</b><span>REPORTS TO YOU</span></div>
+  <div class="abs box rep" style="left:556px" data-in="21.25"><b>Plant head</b><span>REPORTS TO YOU</span></div>
+  <div class="abs box rep" style="left:798px" data-in="21.35"><b>Purchase</b><span>REPORTS TO YOU</span></div>
+  <div class="abs" style="left:690px; top:752px; width:48px; border-top:3px dotted var(--gold)" data-in="21.7" data-anim="draw" data-dur="0.25"></div>
+  <div class="abs box vacant" data-in="21.85" data-anim="pop"><em>?</em><b>YOUR SPARRING PARTNER</b><span id="seat">SEAT VACANT</span></div>
+  <div class="abs body" style="left:72px; top:1066px; width:936px; font-size:36px" data-in="22.3">CA files your returns. Banker sells you loans.<br><span style="color:var(--cream); font-weight:600">Nobody thinks it through with you.</span></div>
+
+  <div class="abs fix" style="top:1228px">
+    <div class="rule" data-in="23.0" data-anim="draw" data-dur="0.5"></div>
+    <div class="label" data-in="23.15">The fix →</div>
+    <div class="h name" style="font-size:66px" data-in="23.3">1:1 Owner Coaching + MIS Monthly</div>
+  </div>
+</section>
+
+<!-- S4 the first step -->
+<section class="scene" data-start="25.4" data-end="99">
+  <svg class="abs" style="left:496px; top:236px; width:88px; height:80px" data-in="25.55" viewBox="0 0 100 92" fill="none" stroke="#D1A955" stroke-width="5" stroke-linejoin="round" stroke-linecap="round">
+    <path d="M50 6 C63 26 63 54 50 76 C37 54 37 26 50 6 Z"/><path d="M50 76 C33 70 17 56 9 34 C29 36 44 52 50 76 Z"/>
+    <path d="M50 76 C67 70 83 56 91 34 C71 36 56 52 50 76 Z"/><path d="M14 88 H86"/></svg>
+  <div class="abs center wordmark" style="top:340px; font-size:34px" data-in="25.6">GAYATRI BUSINESS</div>
+  <div class="abs center h" style="top:470px; font-size:88px" data-in="25.75">Not sure which one is yours?</div>
+  <div class="abs center it" style="top:574px; font-size:92px" data-in="26.05">Ask before you spend lakhs.</div>
+
+  <div class="abs ticket" data-in="26.6" data-anim="stamp" data-dur="0.42">
+    <div class="l"><div class="k">BOOK A</div><div class="t">Discovery Call</div><div class="m">30 MIN · 1:1 WITH FOUNDER</div></div>
+    <div class="sep"></div>
+    <div class="notch" style="top:-16px"></div><div class="notch" style="bottom:-16px"></div>
+    <div class="r"><div class="p">₹501</div><div class="g">INCL. GST</div></div>
+  </div>
+  <div class="abs center mono" style="top:1040px; font-size:24px; letter-spacing:.14em; color:var(--muted)" data-in="27.15">FOUNDER DIVYANSH SINGH · IIM INDORE</div>
+  <div class="abs center" style="top:1100px; display:flex; justify-content:center; gap:14px">
+    <div class="chip2" data-in="27.4" data-anim="pop">30 minutes</div>
+    <div class="chip2" data-in="27.55" data-anim="pop">Your numbers</div>
+    <div class="chip2" data-in="27.7" data-anim="pop">The right plan</div>
+  </div>
+  <div class="abs center" style="top:1196px" data-in="28.1" data-anim="pop"><div class="comment" id="comment">COMMENT <b>“START”</b></div></div>
+  <div class="abs center mono" style="top:1310px; font-size:30px; font-weight:600; letter-spacing:.2em; color:var(--gold)" data-in="28.4">GAYATRI-BUSINESS.COM</div>
+  <div class="abs center mono" style="top:1356px; font-size:26px; letter-spacing:.14em; color:var(--muted)" data-in="28.5">WHATSAPP +91 88580 48888</div>
+</section>
+
+<div id="wipe"></div>
+
+<script>
+const BOUNDS = [3.6, 11.8, 18.8, 25.4];
+const WIPE = 0.24;
+const easeOut = x => 1 - Math.pow(1 - x, 3);
+const easeInOut = x => x < .5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2;
+const back = x => { const c1 = 1.5, c3 = c1 + 1; return 1 + c3 * Math.pow(x - 1, 3) + c1 * Math.pow(x - 1, 2); };
+const clamp = (x, a = 0, b = 1) => Math.max(a, Math.min(b, x));
+
+const scenes = [...document.querySelectorAll('.scene')];
+const animated = [...document.querySelectorAll('[data-in]')];
+animated.forEach(el => { el._base = el.style.transform || ''; });
+
+function apply(el, t) {
+  const t0 = parseFloat(el.dataset.in), dur = parseFloat(el.dataset.dur || 0.5);
+  const kind = el.dataset.anim || 'up';
+  const p = clamp((t - t0) / dur);
+  const base = el._base;
+  if (kind === 'draw') { el.style.transformOrigin = 'left center'; el.style.transform = `${base} scaleX(${easeInOut(p)})`; el.style.opacity = p > 0 ? 1 : 0; return; }
+  if (kind === 'drawc') { el.style.transformOrigin = 'center'; el.style.transform = `scaleX(${easeInOut(p)})`; el.style.opacity = p > 0 ? 1 : 0; return; }
+  if (kind === 'drawy') { el.style.transform = `scaleY(${easeInOut(p)})`; el.style.opacity = p > 0 ? 1 : 0; return; }
+  el.style.opacity = easeOut(clamp(p * 1.6));
+  if (kind === 'up') el.style.transform = `${base} translateY(${(1 - easeOut(p)) * 34}px)`;
+  if (kind === 'slide') el.style.transform = `${base} translateX(${(1 - easeOut(p)) * 70}px)`;
+  if (kind === 'pop') el.style.transform = `${base} scale(${0.7 + 0.3 * back(p)})`;
+  if (kind === 'stamp') el.style.transform = `${base} scale(${1.14 - 0.14 * easeOut(p)}) rotate(${-3 * (1 - easeOut(p))}deg)`;
+}
+
+window.seek = function (t) {
+  let counter = '';
+  for (const s of scenes) {
+    const on = t >= parseFloat(s.dataset.start) && t < parseFloat(s.dataset.end);
+    s.style.display = on ? 'block' : 'none';
+    if (on && s.dataset.counter) counter = s.dataset.counter;
+  }
+  document.getElementById('counter').textContent = counter;
+  document.getElementById('header').style.display = t < 25.4 ? 'flex' : 'none';
+  for (const el of animated) apply(el, t);
+
+  // hook: very slow settle so the thumbnail frame is the finished layout
+  document.getElementById('hook').style.transform = `scale(${1 + 0.018 * clamp(t / 3.6)})`;
+
+  // scene 2: the glass searches left to right and lands on collections
+  const g = document.getElementById('glass');
+  const gp = easeInOut(clamp((t - 13.5) / 0.9));
+  const gx = 130 + gp * (412 - 130), wob = Math.sin(clamp((t - 13.5) / 0.9) * Math.PI) * -22;
+  g.style.transform = `translate(${gx}px, ${722 + wob}px)`;
+  g.style.opacity = clamp((t - 13.4) / 0.2);
+  const hit = t >= 14.4;
+  const coll = document.getElementById('t-coll');
+  coll.style.borderColor = hit ? '#D1A955' : 'transparent';
+  coll.style.background = hit ? '#24584B' : '';
+  for (const [id, off] of [['d1', 0], ['d2', 0.55]]) {
+    const d = document.getElementById(id);
+    const local = t - 14.5 - off;
+    if (local < 0) { d.style.opacity = 0; continue; }
+    const c = (local % 1.1) / 1.1;
+    d.style.opacity = c < .85 ? 1 - c * .9 : 0;
+    d.style.transform = `translateY(${c * 60}px) scale(${1 - c * .35})`;
+  }
+
+  // scene 3: the vacant seat blinks
+  document.getElementById('seat').style.opacity = t > 22.0 ? (Math.floor((t - 22.0) / 0.5) % 2 ? 0.25 : 1) : 1;
+
+  // scene 4: comment pill breathes once it is up
+  document.getElementById('comment').style.transform = t > 28.6 ? `scale(${1 + 0.025 * Math.sin((t - 28.6) * 4)})` : '';
+
+  // gold wipe across each scene boundary
+  let wx = -1100;
+  for (const b of BOUNDS) {
+    if (t >= b - WIPE && t < b) wx = -1080 + 1080 * easeInOut((t - (b - WIPE)) / WIPE);
+    if (t >= b && t < b + WIPE) wx = 1080 * easeInOut((t - b) / WIPE);
+  }
+  document.getElementById('wipe').style.transform = `translateX(${wx}px)`;
+};
+window.seek(0);
+</script>
+</body>
+</html>
