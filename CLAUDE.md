@@ -70,12 +70,22 @@ The end card names ONE offer and ONE keyword. Never two.
 - One 2-second silence after the turn. No music under the first 30 seconds.
 - End card 3s: logo, offer name, published price, keyword, WhatsApp.
 
-## HeyGen constraints
+## Rendering: ElevenLabs (replaces HeyGen; HeyGen free plan blocks avatar creation)
 
 - One speaker per clip. Build conversations shot-reverse-shot and cut them together.
-- 5–15 seconds per `create_model_video` call.
-- 9:16 vertical. Photo avatars from `brand/`.
+- Per line: TTS clip → lipsync clip (photo + audio). Lipsync models: OmniHuman 1.5
+  (`bytedance-omnihuman-v1.5`, takes a performance prompt) or Creatify Aurora.
+- 9:16 vertical. Characters from `brand/`, registered once below — reuse, never re-upload.
 - Nobody smiles while delivering bad news.
+
+## Characters — already created, do not recreate
+
+| Character | Source photo | ElevenLabs asset_id | Voice | voice_id |
+|---|---|---|---|---|
+| Rajesh (promoter) | brand/zaman.png | `j5wAjNW69gIV0LC7ECS6` | Saurav Tandon 2 Pro | `x8QLi04vAqWNOHsZm7yK` |
+| Meera (advisor) | brand/nupur.png | `vQt87BzFWoPXjV2yxksI` | Devi – Patient & Real Support | `diwmCoikrXSjiTKbIHz9` |
+
+Reel 06 flow: `I06Ik9ytqBqsshHl2aAc` (Rajesh node `zRT1uQHhEnxrUPmS23LE`, Meera node `GPprRYd6dbkme9W0W5G3`).
 
 ## Files
 
