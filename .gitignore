@@ -1,0 +1,22 @@
+# Render output — large binaries, rebuildable from scripts
+clips/
+reels/
+*.mp4
+*.mov
+*.wav
+*.mp3
+
+# Secrets — never commit
+*.key
+.env
+.env.*
+.dsh-keys/
+
+# HeyGen / ElevenLabs tokens if ever pasted locally
+*token*.txt
+*api-key*
+
+# OS noise
+Thumbs.db
+desktop.ini
+.DS_Store
