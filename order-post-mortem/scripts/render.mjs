@@ -10,7 +10,8 @@ const out = path.resolve(root, '../out');
 const sh = (cmd, args) => execFileSync(cmd, args, { cwd: root, stdio: 'inherit' });
 const read = (cmd, args) => execFileSync(cmd, args, { cwd: root }).toString().trim();
 
-if (!fs.existsSync(path.resolve(root, '../assets/mix.wav'))) {
+const musicOnly = process.argv.includes('--music-only');
+if (!fs.existsSync(path.resolve(root, '../assets/mix.wav')) && !(musicOnly && fs.existsSync(path.resolve(root, '../assets/mix_music_only.wav')))) {
   console.error('STOP: assets/mix.wav is missing. Run `python3 scripts/audio.py all` after saving assets/vo.wav.');
   process.exit(1);
 }
@@ -21,6 +22,17 @@ for (const [id, file] of [['Reel4x5', 'order-post-mortem-4x5.mp4'], ['Reel9x16',
   sh('npx', ['remotion', 'render', 'src/index.ts', id, path.join(out, file), ...common]);
 }
 sh('npx', ['remotion', 'still', 'src/index.ts', 'Cover', path.join(out, 'cover.png')]);
+
+// AAC pads the last audio frame (30.016 s) and adds a little inter-sample overshoot.
+// Re-mux the audio from the WAV mix: trimmed to 29.98 s and limited so the file is <= 30.0 s and <= -1 dBTP.
+const mixWav = path.resolve(root, '../assets', fs.existsSync(path.resolve(root, '../assets/mix.wav')) ? 'mix.wav' : 'mix_music_only.wav');
+for (const f of ['order-post-mortem-4x5.mp4', 'order-post-mortem-9x16.mp4']) {
+  const p = path.join(out, f), tmp = p.replace('.mp4', '.fixed.mp4');
+  sh('ffmpeg', ['-v', 'error', '-y', '-i', p, '-i', mixWav, '-map', '0:v', '-map', '1:a', '-c:v', 'copy',
+    '-af', 'atrim=0:29.98,alimiter=limit=0.84:level=false:attack=3:release=40,volume=0.15dB',
+    '-c:a', 'aac', '-b:a', '320k', '-ar', '48000', '-movflags', '+faststart', tmp]);
+  fs.renameSync(tmp, p);
+}
 
 for (const f of ['order-post-mortem-4x5.mp4', 'order-post-mortem-9x16.mp4']) {
   const p = path.join(out, f);

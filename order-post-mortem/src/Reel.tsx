@@ -9,7 +9,8 @@ import { Question } from './scenes/Question';
 import { Cta } from './scenes/Cta';
 
 const has = (name: string) => getStaticFiles().some((f) => f.name === name);
-export const MIX = 'mix.wav'; // built by scripts/build_audio.py: cleaned voice + music + SFX, −14 LUFS
+export const MIX = 'mix.wav'; // built by scripts/audio.py: cleaned voice + music + SFX, −14 LUFS
+export const MIX_MUSIC_ONLY = 'mix_music_only.wav'; // used only until a voiceover exists
 
 export type ReelProps = { cover?: boolean; coverAt?: number };
 
@@ -41,7 +42,7 @@ export const Reel: React.FC<ReelProps> = ({ cover, coverAt }) => {
         {!cover && <Subtitles t={t} />}
         <Footer tone={tone} />
       </div>
-      {!cover && has(MIX) && <Audio src={staticFile(MIX)} />}
+      {!cover && (has(MIX) || has(MIX_MUSIC_ONLY)) && <Audio src={staticFile(has(MIX) ? MIX : MIX_MUSIC_ONLY)} />}
     </AbsoluteFill>
   );
 };

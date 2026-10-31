@@ -225,7 +225,7 @@ def mix(cfg, allow_no_vo=False):
         voiced = np.zeros(total, bool)
         for l in cfg["VO_LINES"]:
             voiced |= (t >= T[l["id"]] - 0.2) & (t <= T[l["id"] + ".end"] + 0.2)
-        lift = np.where(voiced, 1.0, 10 ** (A["musicGapLiftDb"] / 20))
+        lift = np.where(voiced, 1.0, 10 ** (A["musicGapLiftDb"] / 20)) if have_vo else np.ones(total)  # no voice: no ducking
         k = int(0.15 * SR); lift = np.convolve(lift, np.ones(k) / k, mode="same")  # smooth ducking
         cut0 = T["loss"] - 0.02
         C = A["musicCutSeconds"]
@@ -246,7 +246,7 @@ def mix(cfg, allow_no_vo=False):
         s = int(at * SR); a = fx[name][: max(0, total - s)]
         out[s:s + len(a)] += a * g * lvl
 
-    target = MIX if have_vo else os.path.join(ASSETS, ".mix_preview_no_vo.wav")  # never ship a voiceless mix.wav
+    target = MIX if have_vo else os.path.join(ASSETS, "mix_music_only.wav")  # mix.wav always means "with your voice"
     tmp = os.path.join(ASSETS, ".mix_raw.wav")
     write_wav(tmp, out)
     loudnorm(tmp, target, A["voLufs"], A["voTruePeak"] - 0.4, extra=["-ac", "2"])  # headroom so the measured TP stays <= -1
