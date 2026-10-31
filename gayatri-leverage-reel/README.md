@@ -4,15 +4,20 @@
 
 - **Edit text, timings, colours, subtitles:** `src/config.ts` (one file).
 - **Scenes:** `src/scenes/*.tsx`, one component per scene. Shared pieces are in `src/components/`.
-- **Optional media:** drop these into `assets/` and they're picked up automatically:
-  - `voiceover.mp3`
-  - `music.mp3` (ducks to 15% while the voiceover speaks)
+- **Audio:** `python3 scripts/build_audio.py assets/source/voiceover-take.mp3` writes three stems to `assets/`:
+  - `voiceover.wav`: the ElevenLabs take (voice "Nishant – Professional Indian English"), cut into its 8 lines and placed on each scene
+  - `music.wav`: an original 100 BPM score composed in code, so there's no copyright claim risk
+  - `sfx.wav`: small sounds synced to the animations
+
+  Remotion ducks the music to 15% under the voice. After rendering, normalise to −14 LUFS (see below).
+- **Optional media:** you can also drop these into `assets/` and they're picked up automatically:
+  - your own `voiceover.wav` or `music.wav` (same names replace the built stems)
   - `logo.png` (replaces the wordmark on the end card)
 - **Fonts:** self-hosted in `assets/fonts` (Playfair Display and Inter, OFL), so renders don't depend on the network.
 
 ```bash
 npm install
 npm run studio   # live preview
-npm run render   # out/gayatri-leverage-reel.mp4
+npm run render   # out/gayatri-leverage-reel.mp4 (then normalise: two-pass ffmpeg loudnorm to I=-14, TP=-1.5)
 npx remotion still src/index.ts Leverage out/cover.png --frame=95 --props='{"cover":true}'
 ```

@@ -31,12 +31,19 @@ export type ReelProps = { cover?: boolean };
 export const Reel: React.FC<ReelProps> = ({ cover }) => {
   const voice = has(MEDIA.voiceover);
   const music = has(MEDIA.music);
-  // Music ducks to MEDIA.musicDuckedVolume while a subtitle cue (a voiceover line) is on screen.
+  const sfx = has(MEDIA.sfx);
+  // Music ducks to MEDIA.musicDuckedVolume while a voiceover line plays, easing over 0.25s each way.
   const musicVolume = (frame: number) => {
     if (!voice) return MEDIA.musicVolume;
     const t = frame / FPS;
-    const speaking = SUBTITLES.some((c) => t >= c.from - 0.2 && t < c.to + 0.2);
-    return speaking ? MEDIA.musicDuckedVolume : MEDIA.musicVolume;
+    const ease = 0.25;
+    const duck = Math.max(0, ...SUBTITLES.map((c) => {
+      if (t < c.from - ease || t > c.to + ease) return 0;
+      if (t < c.from) return (t - (c.from - ease)) / ease;
+      if (t > c.to) return 1 - (t - c.to) / ease;
+      return 1;
+    }));
+    return MEDIA.musicVolume + (MEDIA.musicDuckedVolume - MEDIA.musicVolume) * duck;
   };
   return (
     <AbsoluteFill style={{ background: COLORS.paper, fontVariantNumeric: 'lining-nums', fontFeatureSettings: '"lnum" 1' }}>
@@ -49,6 +56,7 @@ export const Reel: React.FC<ReelProps> = ({ cover }) => {
       <Footer />
       {voice && <Audio src={staticFile(MEDIA.voiceover)} />}
       {music && <Audio src={staticFile(MEDIA.music)} volume={musicVolume} />}
+      {sfx && <Audio src={staticFile(MEDIA.sfx)} volume={MEDIA.sfxVolume} />}
     </AbsoluteFill>
   );
 };

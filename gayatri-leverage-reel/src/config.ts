@@ -33,11 +33,13 @@ export const FOOTER_TEXT = `${CONTACT.site}  |  Call / WhatsApp: ${CONTACT.phone
 
 // Optional media in ./assets (served as Remotion's public dir). Used only if the file exists.
 export const MEDIA = {
-  voiceover: 'voiceover.mp3',
-  music: 'music.mp3',
+  voiceover: 'voiceover.wav', // built by scripts/build_audio.py (or drop in your own)
+  music: 'music.wav',
+  sfx: 'sfx.wav',
   logo: 'logo.png',
-  musicVolume: 0.4,        // music level when nobody is speaking
+  musicVolume: 0.45,       // music level when nobody is speaking
   musicDuckedVolume: 0.15, // music level under the voiceover
+  sfxVolume: 0.9,
 };
 
 export const SCENES = {
@@ -119,25 +121,24 @@ export const TEXT = {
 
 // Burned-in subtitles, synced to the voiceover script.
 export const SUBTITLES: { from: number; to: number; text: string }[] = [
-  { from: 0.25, to: 2.9, text: 'Your sales went up 10%, but your profit jumped 30%.' },
-  { from: 2.9, to: 4.0, text: "That's leverage." },
-  { from: 4.2, to: 7.0, text: 'Rent, salaries and machines cost the same' },
-  { from: 7.0, to: 9.9, text: 'whether you sell more or less.' },
-  { from: 10.15, to: 12.6, text: 'When sales rise, profit rises faster.' },
-  { from: 12.6, to: 15.0, text: 'When sales fall, profit falls faster.' },
-  { from: 15.0, to: 16.9, text: "That's operating leverage." },
-  { from: 17.15, to: 19.6, text: 'A DOL of 3 means every 1% of sales' },
-  { from: 19.6, to: 21.9, text: 'moves operating profit by 3%.' },
-  { from: 22.15, to: 24.8, text: 'Loans add another fixed cost: interest.' },
-  { from: 24.8, to: 27.4, text: 'It has to be paid even in a bad month.' },
-  { from: 27.4, to: 29.9, text: "That's financial leverage." },
-  { from: 30.15, to: 32.9, text: 'Put both together, and a small change in sales' },
-  { from: 32.9, to: 35.9, text: 'can swing your net profit sharply, either way.' },
-  { from: 36.15, to: 38.3, text: "Leverage isn't good or bad." },
-  { from: 38.3, to: 40.9, text: 'Not knowing your numbers is the real risk.' },
-  { from: 41.1, to: 42.6, text: 'Want to know your own leverage?' },
-  { from: 42.6, to: 43.8, text: `Visit ${CONTACT.site} or call Divyansh` },
-  { from: 43.8, to: 45.0, text: 'on 88580 48888 to book your Discovery Call.' },
+  { from: 0.1, to: 3.05, text: 'Your sales went up 10%, but your profit jumped 30%.' },
+  { from: 3.15, to: 4.1, text: "That's leverage." },
+  { from: 4.38, to: 6.68, text: 'Rent, salaries and machines cost the same' },
+  { from: 6.78, to: 8.8, text: 'whether you sell more or less.' },
+  { from: 10.36, to: 12.55, text: 'When sales rise, profit rises faster.' },
+  { from: 12.55, to: 14.85, text: 'When sales fall, profit falls faster.' },
+  { from: 14.93, to: 16.85, text: "That's operating leverage." },
+  { from: 17.11, to: 19.65, text: 'A DOL of 3 means every 1% of sales' },
+  { from: 19.65, to: 21.95, text: 'moves operating profit by 3%.' },
+  { from: 22.4, to: 25.2, text: 'Loans add another fixed cost: interest.' },
+  { from: 25.31, to: 27.35, text: 'It has to be paid even in a bad month.' },
+  { from: 27.43, to: 29.6, text: "That's financial leverage." },
+  { from: 30.41, to: 32.7, text: 'Put both together, and a small change in sales' },
+  { from: 32.7, to: 35.6, text: 'can swing your net profit sharply, either way.' },
+  { from: 36.39, to: 37.8, text: "Leverage isn't good or bad." },
+  { from: 37.8, to: 40.3, text: 'Not knowing your numbers is the real risk.' },
+  { from: 40.38, to: 41.65, text: 'Book your Discovery Call.' },
+  { from: 41.74, to: 45.0, text: `Call Divyansh on ${CONTACT.phone.replace(/ /g, '\u00a0')}.` }, // number never wraps
 ];
 
 // Voiceover script (for the TTS take that becomes assets/voiceover.mp3).
@@ -149,5 +150,5 @@ export const VOICEOVER_SCRIPT = [
   "Loans add another fixed cost: interest. It has to be paid even in a bad month. That's financial leverage.",
   'Put both together and a small change in sales can swing your net profit sharply, either way.',
   "Leverage isn't good or bad. Not knowing your numbers is the real risk.",
-  'Want to know your own leverage? Visit gayatri-business.com or call Divyansh on 88580 48888 to book your Discovery Call.',
+  'Book your Discovery Call. Call Divyansh on 88580 48888.',  // shortened to fit the 4-second CTA scene
 ];
