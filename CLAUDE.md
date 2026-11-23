@@ -63,7 +63,7 @@ The end card names ONE offer and ONE keyword. Never two.
 
 ## Format
 
-- 1080×1920, 30 fps, h264, AAC 192k, −14 LUFS.
+- 1080×1920 (9:16) ONLY for every reel — no 4:5 or other formats. 30 fps, h264, AAC 192k, −14 LUFS.
 - 30–40 seconds. Maximum 9 spoken lines. No line over 15 seconds.
 - Two speakers: one who feels the problem, one who names the fix.
 - Subtitles burned in, condensed sans, bottom third, one line at a time.
