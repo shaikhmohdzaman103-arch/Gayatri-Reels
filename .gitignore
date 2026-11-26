@@ -28,3 +28,6 @@ build/
 order-post-mortem/.whisper-small/
 assets/.mix_preview_no_vo.wav
 out/review/
+
+# Python cache
+__pycache__/
