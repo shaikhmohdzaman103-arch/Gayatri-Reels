@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Add the Gayatri logo and Divyansh's contact panel to any video, keeping its own audio.
+"""Add the Gayatri logo and the Gayatri Business contact panel to any video, keeping its own audio.
 
   python3 tools/brand_overlay.py <input.mp4> <output.mp4>
 
@@ -20,7 +20,7 @@ from PIL import Image, ImageDraw, ImageFilter, ImageFont
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 GREEN, GOLD, WHITE = (6, 63, 50), (201, 151, 43), (250, 248, 243)
 LINE1 = "GAYATRI BUSINESS"
-LINE2 = "Call / WhatsApp Divyansh Singh: +91 88580 48888"
+LINE2 = "Call / WhatsApp: +91 88580 48888"
 
 
 def probe(path):
